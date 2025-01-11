@@ -4,5 +4,6 @@ package interfaces
 import "time-tracker/domain/entities"
 
 type IProjectRepository interface {
-    Save(project *entities.Project) error
+    Create(project *entities.Project) error
+    FindAll() ([]entities.Project, error)
 }

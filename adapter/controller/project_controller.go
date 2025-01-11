@@ -2,29 +2,36 @@
 package controller
 
 import (
-    "time-tracker/domain/interfaces"
+    "time-tracker/adapter/presenter"
     "time-tracker/usecase"
 )
 
 type ProjectController struct {
-    useCase      usecase.IProjectUseCase
-    successPres  interfaces.IProjectPresenter
-    errorPres    interfaces.IErrorPresenter
+    usecase   *usecase.ProjectUsecase
+    presenter *presenter.ProjectPresenter
 }
 
-func NewProjectController(useCase usecase.IProjectUseCase, success interfaces.IProjectPresenter, error interfaces.IErrorPresenter) *ProjectController {
+func NewProjectController(u *usecase.ProjectUsecase, p *presenter.ProjectPresenter) *ProjectController {
     return &ProjectController{
-        useCase:     useCase,
-        successPres: success,
-        errorPres:   error,
+        usecase:   u,
+        presenter: p,
     }
 }
 
 func (c *ProjectController) CreateProject(name, description string) {
-    err := c.useCase.AddProject(name, description)
+    project, err := c.usecase.CreateProject(name, description)
     if err != nil {
-        c.errorPres.ShowError(err)
+        c.presenter.ShowError(err)
         return
     }
-    c.successPres.ShowCreateSuccess(name)
+    c.presenter.ShowCreateSuccess(project)
+}
+
+func (c *ProjectController) ListProjects() {
+    projects, err := c.usecase.ListProjects()
+    if err != nil {
+        c.presenter.ShowError(err)
+        return
+    }
+    c.presenter.ShowProjects(projects)
 }

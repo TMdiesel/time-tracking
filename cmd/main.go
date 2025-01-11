@@ -2,40 +2,43 @@
 package main
 
 import (
-    "database/sql"
-    "fmt"
-    "log"
-    "os"
     "time-tracker/adapter/controller"
-    "time-tracker/infrastructure/repositories"
     "time-tracker/adapter/presenter"
+    "time-tracker/infrastructure/database"
+    "time-tracker/infrastructure/repositories"
     "time-tracker/usecase"
 
-    _ "github.com/mattn/go-sqlite3"
+    "github.com/spf13/cobra"
 )
 
+var rootCmd = &cobra.Command{
+    Use:   "time-tracker",
+    Short: "A CLI for managing projects",
+}
+
 func main() {
-    if len(os.Args) < 3 {
-        log.Fatal("Usage: go run main.go <ProjectName> <Description>")
-    }
-
-    projectName := os.Args[1]
-    projectDescription := os.Args[2]
-
-    db, err := sql.Open("sqlite3", "./time_tracker.db")
-    if err != nil {
-        log.Fatal(err)
-    }
-    defer db.Close()
-
+    db := database.NewDatabase()
     repo := repositories.NewProjectRepository(db)
-    successPresenter := presenter.NewProjectPresenter()
-    errorPresenter := presenter.NewErrorPresenter()
+    pres := presenter.NewProjectPresenter()
+    usecase := usecase.NewProjectUsecase(repo)
+    projectController := controller.NewProjectController(usecase, pres)
 
-    projectUsecase := usecase.NewProjectUseCase(repo)
-    projectController := controller.NewProjectController(projectUsecase, successPresenter, errorPresenter)
+    rootCmd.AddCommand(&cobra.Command{
+        Use:   "create [name] [description]",
+        Short: "Create a new project",
+        Args:  cobra.ExactArgs(2),
+        Run: func(cmd *cobra.Command, args []string) {
+            projectController.CreateProject(args[0], args[1])
+        },
+    })
 
-    projectController.CreateProject(projectName, projectDescription)
+    rootCmd.AddCommand(&cobra.Command{
+        Use:   "list",
+        Short: "List all projects",
+        Run: func(cmd *cobra.Command, args []string) {
+            projectController.ListProjects()
+        },
+    })
 
-    fmt.Println("🚀 Project creation completed!")
+    rootCmd.Execute()
 }

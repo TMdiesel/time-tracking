@@ -1,21 +1,15 @@
 
 package entities
 
-import "time"
+import (
+    "github.com/google/uuid"
+    "time"
+)
 
 type Project struct {
-    ID          int
+    ID          uuid.UUID
     Name        string
     Description string
     CreatedAt   time.Time
     UpdatedAt   time.Time
-}
-
-func NewProject(name, description string) *Project {
-    return &Project{
-        Name:        name,
-        Description: description,
-        CreatedAt:   time.Now(),
-        UpdatedAt:   time.Now(),
-    }
 }
