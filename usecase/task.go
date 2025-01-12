@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"time-tracker/domain/dto"
 	"time-tracker/domain/entities"
 	"time-tracker/domain/interfaces"
 	"time-tracker/domain/service"
@@ -27,6 +28,6 @@ func (u *TaskUsecase) CreateTask(projectID uuid.UUID, name string, description *
 	return task, err
 }
 
-func (u *TaskUsecase) ListTasks() ([]entities.Task, error) {
-	return u.repo.FindAll()
+func (u *TaskUsecase) ListTasks() ([]dto.TaskWithProjectDTO, error) {
+	return u.repo.FindAllWithProjectName()
 }

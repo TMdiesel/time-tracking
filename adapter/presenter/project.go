@@ -18,12 +18,15 @@ func (p *ProjectPresenter) ShowCreateSuccess(project *entities.Project) {
 }
 
 func (p *ProjectPresenter) ShowProjects(projects []entities.Project) {
-	// 作成日順でソート
+	if len(projects) == 0 {
+		fmt.Print("No projects found. Please create a new project to get started.")
+		return
+	}
+	// 名前順でソート
 	sort.SliceStable(projects, func(i, j int) bool {
-		return projects[i].CreatedAt.Before(projects[j].CreatedAt)
+		return projects[i].Name < projects[j].Name
 	})
 
-	fmt.Println("📋 Project List:")
 	for _, project := range projects {
 		desc := "(No description)"
 		if project.Description != nil {

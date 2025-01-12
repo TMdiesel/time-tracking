@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"time-tracker/domain/dto"
 	"time-tracker/domain/entities"
 	"time-tracker/domain/interfaces"
 	"time-tracker/infrastructure/database/model"
@@ -37,23 +38,27 @@ func (r *TaskRepository) IsNameDuplicated(projectID uuid.UUID, name string) (boo
 	return count > 0, nil
 }
 
-func (r *TaskRepository) FindAll() ([]entities.Task, error) {
-	var taskModels []model.Task
-	err := r.db.Find(&taskModels).Error
+func (r *TaskRepository) FindAllWithProjectName() ([]dto.TaskWithProjectDTO, error) {
+	var tasks []model.Task
+
+	err := r.db.Preload("Project").Find(&tasks).Error
 	if err != nil {
 		return nil, err
 	}
 
-	var tasks []entities.Task
-	for _, model := range taskModels {
-		tasks = append(tasks, entities.Task{
-			ID:          model.ID,
-			ProjectID:   model.ProjectID,
-			Name:        model.Name,
-			Description: model.Description,
-			CreatedAt:   model.CreatedAt,
-			UpdatedAt:   model.UpdatedAt,
+	// DTOに変換
+	var result []dto.TaskWithProjectDTO
+	for _, task := range tasks {
+		result = append(result, dto.TaskWithProjectDTO{
+			ID:          task.ID,
+			Name:        task.Name,
+			Description: task.Description,
+			ProjectID:   task.ProjectID,
+			ProjectName: task.Project.Name,
+			CreatedAt:   task.CreatedAt,
+			UpdatedAt:   task.UpdatedAt,
 		})
 	}
-	return tasks, nil
+
+	return result, nil
 }
