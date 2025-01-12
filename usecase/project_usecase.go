@@ -3,18 +3,20 @@ package usecase
 import (
 	"time-tracker/domain/entities"
 	"time-tracker/domain/interfaces"
+	"time-tracker/domain/service"
 )
 
 type ProjectUsecase struct {
-	repo interfaces.IProjectRepository
+	repo    interfaces.IProjectRepository
+	service *service.ProjectService
 }
 
-func NewProjectUsecase(repo interfaces.IProjectRepository) *ProjectUsecase {
-	return &ProjectUsecase{repo: repo}
+func NewProjectUsecase(repo interfaces.IProjectRepository, service *service.ProjectService) *ProjectUsecase {
+	return &ProjectUsecase{repo: repo, service: service}
 }
 
 func (u *ProjectUsecase) CreateProject(name string, description *string) (*entities.Project, error) {
-	project, err := entities.NewProject(name, description)
+	project, err := u.service.NewProject(name, description)
 	if err != nil {
 		return nil, err
 	}

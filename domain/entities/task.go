@@ -18,7 +18,7 @@ type Task struct {
 
 func NewTask(projectID uuid.UUID, name string, description *string) (*Task, error) {
 	if name == "" {
-		return nil, errors.New("Task name not specified")
+		return nil, errors.New("task name not specified")
 	}
 	return &Task{
 		ID:          uuid.New(),

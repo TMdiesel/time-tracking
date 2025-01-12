@@ -3,6 +3,7 @@ package main
 import (
 	"time-tracker/adapter/controller"
 	"time-tracker/adapter/presenter"
+	"time-tracker/domain/service"
 	"time-tracker/infrastructure/database"
 	"time-tracker/infrastructure/repositories"
 	"time-tracker/usecase"
@@ -19,7 +20,8 @@ func main() {
 	db := database.NewDatabase()
 	projectRepo := repositories.NewProjectRepository(db)
 	projectPres := presenter.NewProjectPresenter()
-	projectUsecase := usecase.NewProjectUsecase(projectRepo)
+	projectService := service.NewProjectService(projectRepo)
+	projectUsecase := usecase.NewProjectUsecase(projectRepo, projectService)
 	projectController := controller.NewProjectController(projectUsecase, projectPres)
 	taskRepo := repositories.NewTaskRepository(db)
 	taskPres := presenter.NewTaskPresenter()

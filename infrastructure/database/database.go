@@ -13,6 +13,7 @@ func NewDatabase() *gorm.DB {
 	if err != nil {
 		log.Fatalf("failed to connect database: %v", err)
 	}
+	db.Exec("PRAGMA foreign_keys = ON;")
 	db.AutoMigrate(&model.Project{}, &model.Task{})
 	return db
 }
