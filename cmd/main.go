@@ -25,7 +25,8 @@ func main() {
 	projectController := controller.NewProjectController(projectUsecase, projectPres)
 	taskRepo := repositories.NewTaskRepository(db)
 	taskPres := presenter.NewTaskPresenter()
-	taskUsecase := usecase.NewTaskUsecase(taskRepo)
+	taskService := service.NewTaskService(taskRepo)
+	taskUsecase := usecase.NewTaskUsecase(taskRepo, taskService)
 	taskController := controller.NewTaskController(taskUsecase, taskPres)
 
 	// project

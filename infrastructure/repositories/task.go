@@ -5,6 +5,7 @@ import (
 	"time-tracker/domain/interfaces"
 	"time-tracker/infrastructure/database/model"
 
+	"github.com/google/uuid"
 	"gorm.io/gorm"
 )
 
@@ -25,4 +26,13 @@ func (r *TaskRepository) Create(task *entities.Task) error {
 		CreatedAt:   task.CreatedAt,
 		UpdatedAt:   task.UpdatedAt,
 	}).Error
+}
+
+func (r *TaskRepository) IsNameDuplicated(projectID uuid.UUID, name string) (bool, error) {
+	var count int64
+	err := r.db.Model(&model.Task{}).Where("project_id = ? AND name = ?", projectID, name).Count(&count).Error
+	if err != nil {
+		return false, err
+	}
+	return count > 0, nil
 }

@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"fmt"
 	"time"
 	"time-tracker/domain/entities"
 	"time-tracker/domain/interfaces"
@@ -28,7 +29,7 @@ func (s *ProjectService) NewProject(name string, description *string) (*entities
 		return nil, err
 	}
 	if isDuplicated {
-		return nil, errors.New("project with the same name already exists")
+		return nil, errors.New(fmt.Sprintf("project with the name %s already exists", name))
 	}
 
 	return &entities.Project{

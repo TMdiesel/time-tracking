@@ -3,20 +3,22 @@ package usecase
 import (
 	"time-tracker/domain/entities"
 	"time-tracker/domain/interfaces"
+	"time-tracker/domain/service"
 
 	"github.com/google/uuid"
 )
 
 type TaskUsecase struct {
-	repo interfaces.ITaskRepository
+	repo    interfaces.ITaskRepository
+	service *service.TaskService
 }
 
-func NewTaskUsecase(repo interfaces.ITaskRepository) *TaskUsecase {
-	return &TaskUsecase{repo: repo}
+func NewTaskUsecase(repo interfaces.ITaskRepository, service *service.TaskService) *TaskUsecase {
+	return &TaskUsecase{repo: repo, service: service}
 }
 
 func (u *TaskUsecase) CreateTask(projectID uuid.UUID, name string, description *string) (*entities.Task, error) {
-	task, err := entities.NewTask(projectID, name, description)
+	task, err := u.service.NewTask(projectID, name, description)
 	if err != nil {
 		return nil, err
 	}
