@@ -17,11 +17,16 @@ var rootCmd = &cobra.Command{
 
 func main() {
 	db := database.NewDatabase()
-	repo := repositories.NewProjectRepository(db)
-	pres := presenter.NewProjectPresenter()
-	usecase := usecase.NewProjectUsecase(repo)
-	projectController := controller.NewProjectController(usecase, pres)
+	projectRepo := repositories.NewProjectRepository(db)
+	projectPres := presenter.NewProjectPresenter()
+	projectUsecase := usecase.NewProjectUsecase(projectRepo)
+	projectController := controller.NewProjectController(projectUsecase, projectPres)
+	taskRepo := repositories.NewTaskRepository(db)
+	taskPres := presenter.NewTaskPresenter()
+	taskUsecase := usecase.NewTaskUsecase(taskRepo)
+	taskController := controller.NewTaskController(taskUsecase, taskPres)
 
+	// project
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "create_project [name] [[description]]",
 		Short: "Create a new project",
@@ -34,12 +39,25 @@ func main() {
 			projectController.CreateProject(args[0], description)
 		},
 	})
-
 	rootCmd.AddCommand(&cobra.Command{
 		Use:   "list_projects",
 		Short: "List all projects",
 		Run: func(cmd *cobra.Command, args []string) {
 			projectController.ListProjects()
+		},
+	})
+
+	// task
+	rootCmd.AddCommand(&cobra.Command{
+		Use:   "create_task [project_id] [name] [[description]]",
+		Short: "Create a new task",
+		Args:  cobra.RangeArgs(2, 3),
+		Run: func(cmd *cobra.Command, args []string) {
+			var description *string
+			if len(args) == 3 {
+				description = &args[2]
+			}
+			taskController.CreateTask(args[0], args[1], description)
 		},
 	})
 

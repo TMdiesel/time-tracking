@@ -7,21 +7,22 @@ import (
 	"github.com/google/uuid"
 )
 
-type Project struct {
+type Task struct {
 	ID          uuid.UUID
+	ProjectID   uuid.UUID
 	Name        string
 	Description *string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
 }
 
-func NewProject(name string, description *string) (*Project, error) {
+func NewTask(projectID uuid.UUID, name string, description *string) (*Task, error) {
 	if name == "" {
-		return nil, errors.New("Project name not specified")
+		return nil, errors.New("Task name not specified")
 	}
-
-	return &Project{
+	return &Task{
 		ID:          uuid.New(),
+		ProjectID:   projectID,
 		Name:        name,
 		Description: description,
 		CreatedAt:   time.Now(),

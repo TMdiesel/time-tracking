@@ -4,7 +4,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"gorm.io/gorm"
 )
 
 type Project struct {
@@ -13,11 +12,4 @@ type Project struct {
 	Description *string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
-}
-
-func (p *Project) BeforeCreate(tx *gorm.DB) (err error) {
-	p.ID = uuid.New()
-	p.CreatedAt = time.Now()
-	p.UpdatedAt = time.Now()
-	return
 }
