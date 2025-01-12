@@ -13,7 +13,7 @@ import (
 
 var rootCmd = &cobra.Command{
 	Use:   "time-tracker",
-	Short: "A CLI for managing projects",
+	Short: "A CLI for managing projects and tasks",
 }
 
 func main() {
@@ -23,46 +23,84 @@ func main() {
 	projectService := service.NewProjectService(projectRepo)
 	projectUsecase := usecase.NewProjectUsecase(projectRepo, projectService)
 	projectController := controller.NewProjectController(projectUsecase, projectPres)
+
 	taskRepo := repositories.NewTaskRepository(db)
 	taskPres := presenter.NewTaskPresenter()
 	taskService := service.NewTaskService(taskRepo)
 	taskUsecase := usecase.NewTaskUsecase(taskRepo, taskService)
 	taskController := controller.NewTaskController(taskUsecase, taskPres)
 
-	// project
-	rootCmd.AddCommand(&cobra.Command{
-		Use:   "create_project [name] [[description]]",
+	// --- Project Commands ---
+	projectCmd := &cobra.Command{
+		Use:   "project",
+		Short: "Manage projects",
+	}
+
+	// project create
+	createProjectCmd := &cobra.Command{
+		Use:   "create",
 		Short: "Create a new project",
-		Args:  cobra.RangeArgs(1, 2),
 		Run: func(cmd *cobra.Command, args []string) {
-			var description *string
-			if len(args) == 2 {
-				description = &args[1]
+			name, _ := cmd.Flags().GetString("name")
+			description, _ := cmd.Flags().GetString("description")
+			var descPtr *string
+			if description != "" {
+				descPtr = &description
 			}
-			projectController.CreateProject(args[0], description)
+			projectController.CreateProject(name, descPtr)
 		},
-	})
-	rootCmd.AddCommand(&cobra.Command{
-		Use:   "list_projects",
+	}
+	createProjectCmd.Flags().StringP("name", "n", "", "Project name (required)")
+	createProjectCmd.Flags().StringP("description", "d", "", "Project description (optional)")
+	createProjectCmd.MarkFlagRequired("name")
+	createProjectCmd.Flags().SortFlags = false
+
+	// project list
+	listProjectCmd := &cobra.Command{
+		Use:   "list",
 		Short: "List all projects",
 		Run: func(cmd *cobra.Command, args []string) {
 			projectController.ListProjects()
 		},
-	})
+	}
 
-	// task
-	rootCmd.AddCommand(&cobra.Command{
-		Use:   "create_task [project_id] [name] [[description]]",
+	// --- Task Commands ---
+	taskCmd := &cobra.Command{
+		Use:   "task",
+		Short: "Manage tasks",
+	}
+
+	// task create
+	createTaskCmd := &cobra.Command{
+		Use:   "create",
 		Short: "Create a new task",
-		Args:  cobra.RangeArgs(2, 3),
 		Run: func(cmd *cobra.Command, args []string) {
-			var description *string
-			if len(args) == 3 {
-				description = &args[2]
-			}
-			taskController.CreateTask(args[0], args[1], description)
-		},
-	})
+			projectID, _ := cmd.Flags().GetString("project")
+			name, _ := cmd.Flags().GetString("name")
+			description, _ := cmd.Flags().GetString("description")
 
+			var descPtr *string
+			if description != "" {
+				descPtr = &description
+			}
+
+			taskController.CreateTask(projectID, name, descPtr)
+		},
+	}
+	createTaskCmd.Flags().StringP("project", "p", "", "Project ID (required)")
+	createTaskCmd.Flags().StringP("name", "n", "", "Task name (required)")
+	createTaskCmd.Flags().StringP("description", "d", "", "Task description (optional)")
+	createTaskCmd.MarkFlagRequired("project")
+	createTaskCmd.MarkFlagRequired("name")
+	createTaskCmd.Flags().SortFlags = false
+
+	// --- コマンド登録 ---
+	projectCmd.AddCommand(createProjectCmd)
+	projectCmd.AddCommand(listProjectCmd)
+	taskCmd.AddCommand(createTaskCmd)
+	rootCmd.AddCommand(projectCmd)
+	rootCmd.AddCommand(taskCmd)
+
+	// 実行
 	rootCmd.Execute()
 }
