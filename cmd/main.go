@@ -28,7 +28,7 @@ func main() {
 	taskPres := presenter.NewTaskPresenter()
 	taskService := service.NewTaskService(taskRepo)
 	taskUsecase := usecase.NewTaskUsecase(taskRepo, taskService)
-	taskController := controller.NewTaskController(taskUsecase, taskPres)
+	taskController := controller.NewTaskController(taskUsecase, projectUsecase, taskPres)
 
 	// --- Project Commands ---
 	projectCmd := &cobra.Command{
@@ -75,7 +75,6 @@ func main() {
 		Use:   "create",
 		Short: "Create a new task",
 		Run: func(cmd *cobra.Command, args []string) {
-			projectID, _ := cmd.Flags().GetString("project")
 			name, _ := cmd.Flags().GetString("name")
 			description, _ := cmd.Flags().GetString("description")
 
@@ -84,10 +83,9 @@ func main() {
 				descPtr = &description
 			}
 
-			taskController.CreateTask(projectID, name, descPtr)
+			taskController.CreateTask(name, descPtr)
 		},
 	}
-	createTaskCmd.Flags().StringP("project", "p", "", "Project ID (required)")
 	createTaskCmd.Flags().StringP("name", "n", "", "Task name (required)")
 	createTaskCmd.Flags().StringP("description", "d", "", "Task description (optional)")
 	createTaskCmd.MarkFlagRequired("project")
