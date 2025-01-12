@@ -11,4 +11,5 @@ type ITaskRepository interface {
 	Create(task *entities.Task) error
 	IsNameDuplicated(projectID uuid.UUID, name string) (bool, error)
 	FindAllWithProjectName() ([]dto.TaskWithProjectDTO, error)
+	GetTaskByID(taskID uuid.UUID) (*entities.Task, error)
 }

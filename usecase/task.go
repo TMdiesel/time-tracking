@@ -10,24 +10,35 @@ import (
 )
 
 type TaskUsecase struct {
-	repo    interfaces.ITaskRepository
-	service *service.TaskService
+	taskRepo         interfaces.ITaskRepository
+	timeEntryRepo    interfaces.ITimeEntryRepository
+	taskService      *service.TaskService
+	timeEntryService *service.TimeEntryService
 }
 
-func NewTaskUsecase(repo interfaces.ITaskRepository, service *service.TaskService) *TaskUsecase {
-	return &TaskUsecase{repo: repo, service: service}
+func NewTaskUsecase(taskRepo interfaces.ITaskRepository, timeEntryRepo interfaces.ITimeEntryRepository, taskService *service.TaskService, timeEntryService *service.TimeEntryService) *TaskUsecase {
+	return &TaskUsecase{taskRepo: taskRepo, timeEntryRepo: timeEntryRepo, taskService: taskService, timeEntryService: timeEntryService}
 }
 
 func (u *TaskUsecase) CreateTask(projectID uuid.UUID, name string, description *string) (*entities.Task, error) {
-	task, err := u.service.NewTask(projectID, name, description)
+	task, err := u.taskService.NewTask(projectID, name, description)
 	if err != nil {
 		return nil, err
 	}
 
-	err = u.repo.Create(task)
+	err = u.taskRepo.Create(task)
 	return task, err
 }
 
 func (u *TaskUsecase) ListTasks() ([]dto.TaskWithProjectDTO, error) {
-	return u.repo.FindAllWithProjectName()
+	return u.taskRepo.FindAllWithProjectName()
+}
+
+func (u *TaskUsecase) StartTask(taskID uuid.UUID) error {
+	timeEntry, err := u.timeEntryService.NewTimeEntry(taskID)
+	if err != nil {
+		return err
+	}
+	err = u.timeEntryRepo.Create(timeEntry)
+	return err
 }

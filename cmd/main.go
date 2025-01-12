@@ -27,7 +27,10 @@ func main() {
 	taskRepo := repositories.NewTaskRepository(db)
 	taskPres := presenter.NewTaskPresenter()
 	taskService := service.NewTaskService(taskRepo)
-	taskUsecase := usecase.NewTaskUsecase(taskRepo, taskService)
+	timeEntryRepo := repositories.NewTimeEntryRepository(db)
+	timeEntryService := service.NewTimeEntryService(taskRepo)
+
+	taskUsecase := usecase.NewTaskUsecase(taskRepo, timeEntryRepo, taskService, timeEntryService)
 	taskController := controller.NewTaskController(taskUsecase, projectUsecase, taskPres)
 
 	// --- Project Commands ---
@@ -101,11 +104,21 @@ func main() {
 		},
 	}
 
+	// task start
+	startTaskCmd := &cobra.Command{
+		Use:   "start",
+		Short: "start a task",
+		Run: func(cmd *cobra.Command, args []string) {
+			taskController.StartTask()
+		},
+	}
+
 	// --- コマンド登録 ---
 	projectCmd.AddCommand(createProjectCmd)
 	projectCmd.AddCommand(listProjectCmd)
 	taskCmd.AddCommand(createTaskCmd)
 	taskCmd.AddCommand(listTaskCmd)
+	taskCmd.AddCommand(startTaskCmd)
 	rootCmd.AddCommand(projectCmd)
 	rootCmd.AddCommand(taskCmd)
 

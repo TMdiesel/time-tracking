@@ -45,3 +45,7 @@ func (p *TaskPresenter) ShowTasks(tasks []dto.TaskWithProjectDTO) {
 		fmt.Printf("- [%s] %s: %s\n", task.ProjectName, task.Name, desc)
 	}
 }
+
+func (p *TaskPresenter) ShowStartSuccess(task dto.TaskWithProjectDTO) {
+	fmt.Printf("✅ Task %s has been started.", task.Name)
+}

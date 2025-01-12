@@ -62,3 +62,27 @@ func (r *TaskRepository) FindAllWithProjectName() ([]dto.TaskWithProjectDTO, err
 
 	return result, nil
 }
+
+func (r *TaskRepository) GetTaskByID(taskID uuid.UUID) (*entities.Task, error) {
+	var taskModel model.Task
+
+	// タスクIDで検索
+	err := r.db.First(&taskModel, "id = ?", taskID).Error
+	if err != nil {
+		if err == gorm.ErrRecordNotFound {
+			return nil, nil
+		}
+		return nil, err
+	}
+
+	task := &entities.Task{
+		ID:          taskModel.ID,
+		ProjectID:   taskModel.ProjectID,
+		Name:        taskModel.Name,
+		Description: taskModel.Description,
+		CreatedAt:   taskModel.CreatedAt,
+		UpdatedAt:   taskModel.UpdatedAt,
+	}
+
+	return task, nil
+}

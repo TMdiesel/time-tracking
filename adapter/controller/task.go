@@ -3,6 +3,7 @@ package controller
 import (
 	"fmt"
 	"time-tracker/adapter/presenter"
+	"time-tracker/domain/dto"
 	"time-tracker/domain/entities"
 	"time-tracker/usecase"
 
@@ -68,7 +69,7 @@ func (c *TaskController) selectProjectInteractive(projects []entities.Project) (
 		projectNames = append(projectNames, project.Name)
 	}
 
-	// promptui を使用してインタラクティブ選択
+	// インタラクティブ選択
 	prompt := promptui.Select{
 		Label: "Select a Project",
 		Items: projectNames,
@@ -79,4 +80,52 @@ func (c *TaskController) selectProjectInteractive(projects []entities.Project) (
 	}
 
 	return projects[index], nil
+}
+
+func (c *TaskController) StartTask() {
+	// タスク一覧の取得
+	tasks, err := c.taskUsecase.ListTasks()
+	if err != nil {
+		c.presenter.ShowError(err)
+		return
+	}
+	if len(tasks) == 0 {
+		c.presenter.ShowError(fmt.Errorf("No tasks available. Please create a task first"))
+		return
+	}
+
+	// インタラクティブにタスク選択
+	selectedTask, err := c.selectTaskInteractive(tasks)
+	if err != nil {
+		c.presenter.ShowError(err)
+		return
+	}
+
+	// タスク開始
+	err = c.taskUsecase.StartTask(selectedTask.ID)
+	if err != nil {
+		c.presenter.ShowError(err)
+		return
+	}
+
+	c.presenter.ShowStartSuccess(selectedTask)
+}
+
+// インタラクティブにタスク選択
+func (c *TaskController) selectTaskInteractive(tasks []dto.TaskWithProjectDTO) (dto.TaskWithProjectDTO, error) {
+	taskNames := []string{}
+	for _, task := range tasks {
+		taskNames = append(taskNames, task.Name)
+	}
+
+	prompt := promptui.Select{
+		Label: "Select a Task to Start",
+		Items: taskNames,
+	}
+	index, _, err := prompt.Run()
+	if err != nil {
+		return dto.TaskWithProjectDTO{}, fmt.Errorf("Task selection failed: %v", err)
+	}
+
+	return tasks[index], nil
 }

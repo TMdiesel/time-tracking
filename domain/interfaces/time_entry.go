@@ -1,0 +1,9 @@
+package interfaces
+
+import (
+	"time-tracker/domain/entities"
+)
+
+type ITimeEntryRepository interface {
+	Create(timeEntry *entities.TimeEntry) error
+}
