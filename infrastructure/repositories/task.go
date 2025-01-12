@@ -36,3 +36,24 @@ func (r *TaskRepository) IsNameDuplicated(projectID uuid.UUID, name string) (boo
 	}
 	return count > 0, nil
 }
+
+func (r *TaskRepository) FindAll() ([]entities.Task, error) {
+	var taskModels []model.Task
+	err := r.db.Find(&taskModels).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var tasks []entities.Task
+	for _, model := range taskModels {
+		tasks = append(tasks, entities.Task{
+			ID:          model.ID,
+			ProjectID:   model.ProjectID,
+			Name:        model.Name,
+			Description: model.Description,
+			CreatedAt:   model.CreatedAt,
+			UpdatedAt:   model.UpdatedAt,
+		})
+	}
+	return tasks, nil
+}

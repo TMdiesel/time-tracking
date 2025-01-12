@@ -52,6 +52,15 @@ func (c *TaskController) CreateTask(name string, description *string) {
 	c.presenter.ShowCreateSuccess(task)
 }
 
+func (c *TaskController) ListTasks() {
+	tasks, err := c.taskUsecase.ListTasks()
+	if err != nil {
+		c.presenter.ShowError(err)
+		return
+	}
+	c.presenter.ShowTasks(tasks)
+}
+
 // インタラクティブにプロジェクト選択
 func (c *TaskController) selectProjectInteractive(projects []entities.Project) (entities.Project, error) {
 	projectNames := []string{}

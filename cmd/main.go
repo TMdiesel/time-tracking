@@ -92,10 +92,20 @@ func main() {
 	createTaskCmd.MarkFlagRequired("name")
 	createTaskCmd.Flags().SortFlags = false
 
+	// task list
+	listTaskCmd := &cobra.Command{
+		Use:   "list",
+		Short: "List all tasks",
+		Run: func(cmd *cobra.Command, args []string) {
+			taskController.ListTasks()
+		},
+	}
+
 	// --- コマンド登録 ---
 	projectCmd.AddCommand(createProjectCmd)
 	projectCmd.AddCommand(listProjectCmd)
 	taskCmd.AddCommand(createTaskCmd)
+	taskCmd.AddCommand(listTaskCmd)
 	rootCmd.AddCommand(projectCmd)
 	rootCmd.AddCommand(taskCmd)
 

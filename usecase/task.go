@@ -26,3 +26,7 @@ func (u *TaskUsecase) CreateTask(projectID uuid.UUID, name string, description *
 	err = u.repo.Create(task)
 	return task, err
 }
+
+func (u *TaskUsecase) ListTasks() ([]entities.Task, error) {
+	return u.repo.FindAll()
+}

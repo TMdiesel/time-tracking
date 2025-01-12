@@ -20,3 +20,14 @@ func (p *TaskPresenter) ShowError(err error) {
 	fmt.Printf("❌ Error: %v\n", err)
 	os.Exit(1)
 }
+
+func (p *TaskPresenter) ShowTasks(tasks []entities.Task) {
+	for _, task := range tasks {
+		desc := "(No description)"
+		if task.Description != nil {
+			desc = *task.Description
+		}
+		fmt.Printf("- %s: %s\n", task.Name, desc)
+
+	}
+}
