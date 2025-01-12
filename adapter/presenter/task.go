@@ -2,6 +2,7 @@ package presenter
 
 import (
 	"fmt"
+	"os"
 	"time-tracker/domain/entities"
 )
 
@@ -17,4 +18,5 @@ func (p *TaskPresenter) ShowCreateSuccess(task *entities.Task) {
 
 func (p *TaskPresenter) ShowError(err error) {
 	fmt.Printf("❌ Error: %v\n", err)
+	os.Exit(1)
 }

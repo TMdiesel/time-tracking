@@ -2,6 +2,7 @@ package presenter
 
 import (
 	"fmt"
+	"os"
 	"sort"
 	"time-tracker/domain/entities"
 )
@@ -34,4 +35,5 @@ func (p *ProjectPresenter) ShowProjects(projects []entities.Project) {
 
 func (p *ProjectPresenter) ShowError(err error) {
 	fmt.Printf("❌ Error: %v\n", err)
+	os.Exit(1)
 }
