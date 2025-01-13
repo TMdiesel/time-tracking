@@ -25,3 +25,24 @@ func (r *TimeEntryRepository) Create(timeEntry *entities.TimeEntry) error {
 		Duration:  timeEntry.Duration,
 	}).Error
 }
+
+func (r *TimeEntryRepository) GetAllRunning() ([]entities.TimeEntry, error) {
+	var timeEntryModels []model.TimeEntry
+	err := r.db.Where("ended_at IS NULL").Find(&timeEntryModels).Error
+	if err != nil {
+		return nil, err
+	}
+
+	var timeEntries []entities.TimeEntry
+	for _, entry := range timeEntryModels {
+		timeEntries = append(timeEntries, entities.TimeEntry{
+			ID:        entry.ID,
+			TaskID:    entry.TaskID,
+			StartedAt: entry.StartedAt,
+			EndedAt:   entry.EndedAt,
+			Duration:  entry.Duration,
+		})
+	}
+
+	return timeEntries, nil
+}

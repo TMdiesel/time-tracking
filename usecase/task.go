@@ -1,6 +1,7 @@
 package usecase
 
 import (
+	"fmt"
 	"time-tracker/domain/dto"
 	"time-tracker/domain/entities"
 	"time-tracker/domain/interfaces"
@@ -35,6 +36,15 @@ func (u *TaskUsecase) ListTasks() ([]dto.TaskWithProjectDTO, error) {
 }
 
 func (u *TaskUsecase) StartTask(taskID uuid.UUID) error {
+	// 実行中のタスクが存在する場合は開始できない
+	runningTimeEntries, err := u.timeEntryRepo.GetAllRunning()
+	if err != nil {
+		return err
+	}
+	if len(runningTimeEntries) > 0 {
+		return fmt.Errorf("Another task is already running. Please stop it before starting a new one.")
+	}
+
 	timeEntry, err := u.timeEntryService.NewTimeEntry(taskID)
 	if err != nil {
 		return err
