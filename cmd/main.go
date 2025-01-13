@@ -113,12 +113,22 @@ func main() {
 		},
 	}
 
+	// task stop
+	stopTaskCmd := &cobra.Command{
+		Use:   "stop",
+		Short: "stop a task",
+		Run: func(cmd *cobra.Command, args []string) {
+			taskController.StopTask()
+		},
+	}
+
 	// --- コマンド登録 ---
 	projectCmd.AddCommand(createProjectCmd)
 	projectCmd.AddCommand(listProjectCmd)
 	taskCmd.AddCommand(createTaskCmd)
 	taskCmd.AddCommand(listTaskCmd)
 	taskCmd.AddCommand(startTaskCmd)
+	taskCmd.AddCommand(stopTaskCmd)
 	rootCmd.AddCommand(projectCmd)
 	rootCmd.AddCommand(taskCmd)
 

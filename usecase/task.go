@@ -52,3 +52,27 @@ func (u *TaskUsecase) StartTask(taskID uuid.UUID) error {
 	err = u.timeEntryRepo.Create(timeEntry)
 	return err
 }
+
+func (u *TaskUsecase) StopTask() error {
+	runningTimeEntries, err := u.timeEntryRepo.GetAllRunning()
+	if err != nil {
+		return err
+	}
+	if len(runningTimeEntries) == 0 {
+		return fmt.Errorf("No running task to stop.")
+	}
+
+	// タスク停止処理
+	if len(runningTimeEntries) >= 2 {
+		fmt.Println("⚠️ Multiple running tasks detected. All will be stopped.")
+
+	}
+	for _, entry := range runningTimeEntries {
+		entry.End()
+		if err := u.timeEntryRepo.Update(&entry); err != nil {
+			return err
+		}
+	}
+
+	return nil
+}

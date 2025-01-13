@@ -49,3 +49,7 @@ func (p *TaskPresenter) ShowTasks(tasks []dto.TaskWithProjectDTO) {
 func (p *TaskPresenter) ShowStartSuccess(task dto.TaskWithProjectDTO) {
 	fmt.Printf("✅ Task %s has been started.", task.Name)
 }
+
+func (p *TaskPresenter) ShowStopSuccess() {
+	fmt.Printf("✅ Task has been stopped.")
+}

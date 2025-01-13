@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"fmt"
 	"time-tracker/domain/entities"
 	"time-tracker/domain/interfaces"
 	"time-tracker/infrastructure/database/model"
@@ -45,4 +46,19 @@ func (r *TimeEntryRepository) GetAllRunning() ([]entities.TimeEntry, error) {
 	}
 
 	return timeEntries, nil
+}
+
+func (r *TimeEntryRepository) Update(timeEntry *entities.TimeEntry) error {
+	updatedModel := model.TimeEntry{
+		ID:        timeEntry.ID,
+		TaskID:    timeEntry.TaskID,
+		StartedAt: timeEntry.StartedAt,
+		EndedAt:   timeEntry.EndedAt,
+		Duration:  timeEntry.Duration,
+	}
+	if err := r.db.Save(&updatedModel).Error; err != nil {
+		return fmt.Errorf("failed to update time entry: %w", err)
+	}
+
+	return nil
 }
