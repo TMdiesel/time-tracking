@@ -113,12 +113,12 @@ func main() {
 		},
 	}
 
-	// task stop
-	stopTaskCmd := &cobra.Command{
-		Use:   "stop",
-		Short: "stop a task",
+	// task end
+	endTaskCmd := &cobra.Command{
+		Use:   "end",
+		Short: "end a task",
 		Run: func(cmd *cobra.Command, args []string) {
-			taskController.StopTask()
+			taskController.EndTask()
 		},
 	}
 
@@ -128,7 +128,7 @@ func main() {
 	taskCmd.AddCommand(createTaskCmd)
 	taskCmd.AddCommand(listTaskCmd)
 	taskCmd.AddCommand(startTaskCmd)
-	taskCmd.AddCommand(stopTaskCmd)
+	taskCmd.AddCommand(endTaskCmd)
 	rootCmd.AddCommand(projectCmd)
 	rootCmd.AddCommand(taskCmd)
 

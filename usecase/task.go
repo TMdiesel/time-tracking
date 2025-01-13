@@ -42,7 +42,7 @@ func (u *TaskUsecase) StartTask(taskID uuid.UUID) error {
 		return err
 	}
 	if len(runningTimeEntries) > 0 {
-		return fmt.Errorf("Another task is already running. Please stop it before starting a new one.")
+		return fmt.Errorf("Another task is already running. Please end it before starting a new one.")
 	}
 
 	timeEntry, err := u.timeEntryService.NewTimeEntry(taskID)
@@ -53,18 +53,18 @@ func (u *TaskUsecase) StartTask(taskID uuid.UUID) error {
 	return err
 }
 
-func (u *TaskUsecase) StopTask() error {
+func (u *TaskUsecase) EndTask() error {
 	runningTimeEntries, err := u.timeEntryRepo.GetAllRunning()
 	if err != nil {
 		return err
 	}
 	if len(runningTimeEntries) == 0 {
-		return fmt.Errorf("No running task to stop.")
+		return fmt.Errorf("No running task to end.")
 	}
 
 	// タスク停止処理
 	if len(runningTimeEntries) >= 2 {
-		fmt.Println("⚠️ Multiple running tasks detected. All will be stopped.")
+		fmt.Println("⚠️ Multiple running tasks detected. All will be ended.")
 
 	}
 	for _, entry := range runningTimeEntries {

@@ -130,11 +130,11 @@ func (c *TaskController) selectTaskInteractive(tasks []dto.TaskWithProjectDTO) (
 	return tasks[index], nil
 }
 
-func (c *TaskController) StopTask() {
-	err := c.taskUsecase.StopTask()
+func (c *TaskController) EndTask() {
+	err := c.taskUsecase.EndTask()
 	if err != nil {
 		c.presenter.ShowError(err)
 		return
 	}
-	c.presenter.ShowStopSuccess()
+	c.presenter.ShowEndSuccess()
 }
