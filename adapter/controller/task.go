@@ -2,6 +2,7 @@ package controller
 
 import (
 	"fmt"
+	"sort"
 	"time-tracker/adapter/presenter"
 	"time-tracker/domain/dto"
 	"time-tracker/domain/entities"
@@ -34,6 +35,11 @@ func (c *TaskController) CreateTask(name string, description *string) {
 	if len(projects) == 0 {
 		c.presenter.ShowError(fmt.Errorf("No projects available. Please create a project first"))
 	}
+
+	// 名前順でソート
+	sort.SliceStable(projects, func(i, j int) bool {
+		return projects[i].Name < projects[j].Name
+	})
 
 	// インタラクティブにプロジェクト選択
 	selectedProject, err := c.selectProjectInteractive(projects)
@@ -94,6 +100,14 @@ func (c *TaskController) StartTask() {
 		return
 	}
 
+	//タスクのソート（ProjectName → Nameの順）
+	sort.SliceStable(tasks, func(i, j int) bool {
+		if tasks[i].ProjectName == tasks[j].ProjectName {
+			return tasks[i].Name < tasks[j].Name
+		}
+		return tasks[i].ProjectName < tasks[j].ProjectName
+	})
+
 	// インタラクティブにタスク選択
 	selectedTask, err := c.selectTaskInteractive(tasks)
 	if err != nil {
@@ -113,15 +127,16 @@ func (c *TaskController) StartTask() {
 
 // インタラクティブにタスク選択
 func (c *TaskController) selectTaskInteractive(tasks []dto.TaskWithProjectDTO) (dto.TaskWithProjectDTO, error) {
-	taskNames := []string{}
+	taskItems := []string{}
 	for _, task := range tasks {
-		taskNames = append(taskNames, task.Name)
+		taskItems = append(taskItems, fmt.Sprintf("[%s] %s", task.ProjectName, task.Name))
 	}
 
 	prompt := promptui.Select{
 		Label: "Select a Task to Start",
-		Items: taskNames,
+		Items: taskItems,
 	}
+
 	index, _, err := prompt.Run()
 	if err != nil {
 		return dto.TaskWithProjectDTO{}, fmt.Errorf("Task selection failed: %v", err)
