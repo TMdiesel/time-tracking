@@ -28,10 +28,13 @@ func main() {
 	taskPres := presenter.NewTaskPresenter()
 	taskService := service.NewTaskService(taskRepo)
 	timeEntryRepo := repositories.NewTimeEntryRepository(db)
+	timeEntryPres := presenter.NewTimeEntryPresenter()
 	timeEntryService := service.NewTimeEntryService(taskRepo)
 
 	taskUsecase := usecase.NewTaskUsecase(taskRepo, timeEntryRepo, taskService, timeEntryService)
 	taskController := controller.NewTaskController(taskUsecase, projectUsecase, taskPres)
+	timeEntryUsecase := usecase.NewTimeEntryUsecase(timeEntryRepo)
+	timeEntryController := controller.NewTimeEntryController(timeEntryUsecase, timeEntryPres)
 
 	// --- Project Commands ---
 	projectCmd := &cobra.Command{
@@ -122,6 +125,26 @@ func main() {
 		},
 	}
 
+	// --- TimeEntry Commands ---
+	timeEntryCmd := &cobra.Command{
+		Use:   "entry",
+		Short: "Manage time entries",
+	}
+
+	// time entry list
+	listTimeEntryCmd := &cobra.Command{
+		Use:   "list",
+		Short: "List time entries",
+		Run: func(cmd *cobra.Command, args []string) {
+			from, _ := cmd.Flags().GetString("from")
+			to, _ := cmd.Flags().GetString("to")
+			timeEntryController.ListTimeEntries(from, to)
+		},
+	}
+	listTimeEntryCmd.Flags().StringP("from", "f", "", "Start date (YYYY-MM-DD) (optional)")
+	listTimeEntryCmd.Flags().StringP("to", "t", "", "End date (YYYY-MM-DD) (optional)")
+	listTimeEntryCmd.Flags().SortFlags = false
+
 	// --- コマンド登録 ---
 	projectCmd.AddCommand(createProjectCmd)
 	projectCmd.AddCommand(listProjectCmd)
@@ -129,8 +152,10 @@ func main() {
 	taskCmd.AddCommand(listTaskCmd)
 	taskCmd.AddCommand(startTaskCmd)
 	taskCmd.AddCommand(endTaskCmd)
+	timeEntryCmd.AddCommand(listTimeEntryCmd)
 	rootCmd.AddCommand(projectCmd)
 	rootCmd.AddCommand(taskCmd)
+	rootCmd.AddCommand(timeEntryCmd)
 
 	// 実行
 	rootCmd.Execute()

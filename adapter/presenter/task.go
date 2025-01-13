@@ -15,7 +15,7 @@ func NewTaskPresenter() *TaskPresenter {
 }
 
 func (p *TaskPresenter) ShowCreateSuccess(task *entities.Task) {
-	fmt.Printf("✅ Task '%s' has been created.\n", task.Name)
+	fmt.Printf("✅ Task '%s' has been created.", task.Name)
 }
 
 func (p *TaskPresenter) ShowError(err error) {
