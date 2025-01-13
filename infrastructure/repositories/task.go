@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"fmt"
 	"time-tracker/domain/dto"
 	"time-tracker/domain/entities"
 	"time-tracker/domain/interfaces"
@@ -38,10 +39,10 @@ func (r *TaskRepository) IsNameDuplicated(projectID uuid.UUID, name string) (boo
 	return count > 0, nil
 }
 
-func (r *TaskRepository) FindAllWithProjectName() ([]dto.TaskWithProjectDTO, error) {
+func (r *TaskRepository) FindAllActiveWithProjectName() ([]dto.TaskWithProjectDTO, error) {
 	var tasks []model.Task
 
-	err := r.db.Preload("Project").Find(&tasks).Error
+	err := r.db.Preload("Project").Where("archived_at IS NULL").Find(&tasks).Error
 	if err != nil {
 		return nil, err
 	}
@@ -85,4 +86,46 @@ func (r *TaskRepository) GetTaskByID(taskID uuid.UUID) (*entities.Task, error) {
 	}
 
 	return task, nil
+}
+
+func (r *TaskRepository) GetByProjectID(projectID uuid.UUID) ([]entities.Task, error) {
+	var taskModels []model.Task
+
+	// ProjectIDでタスクを検索
+	err := r.db.Where("project_id = ?", projectID).Find(&taskModels).Error
+	if err != nil {
+		return nil, fmt.Errorf("failed to retrieve tasks by project ID: %w", err)
+	}
+
+	var tasks []entities.Task
+	for _, taskModel := range taskModels {
+		tasks = append(tasks, entities.Task{
+			ID:          taskModel.ID,
+			ProjectID:   taskModel.ProjectID,
+			Name:        taskModel.Name,
+			Description: taskModel.Description,
+			CreatedAt:   taskModel.CreatedAt,
+			UpdatedAt:   taskModel.UpdatedAt,
+			ArchivedAt:  taskModel.ArchivedAt,
+		})
+	}
+
+	return tasks, nil
+}
+
+func (r *TaskRepository) Update(task *entities.Task) error {
+	updatedModel := model.Task{
+		ID:          task.ID,
+		ProjectID:   task.ProjectID,
+		Name:        task.Name,
+		Description: task.Description,
+		CreatedAt:   task.CreatedAt,
+		UpdatedAt:   task.UpdatedAt,
+		ArchivedAt:  task.ArchivedAt,
+	}
+	if err := r.db.Save(&updatedModel).Error; err != nil {
+		return fmt.Errorf("failed to update: %w", err)
+	}
+
+	return nil
 }

@@ -62,7 +62,7 @@ func (c *ProjectController) ArchiveProject() {
 		return
 	}
 
-	err = c.usecase.ArchiveProject(selectedProject)
+	err = c.usecase.ArchiveProjectAndRelatedTasks(selectedProject)
 	if err != nil {
 		c.presenter.ShowError(err)
 		return

@@ -15,3 +15,8 @@ type Task struct {
 	UpdatedAt   time.Time
 	ArchivedAt  *time.Time
 }
+
+func (e *Task) Archive() {
+	now := time.Now()
+	e.ArchivedAt = &now
+}

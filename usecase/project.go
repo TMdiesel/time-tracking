@@ -7,12 +7,13 @@ import (
 )
 
 type ProjectUsecase struct {
-	repo    interfaces.IProjectRepository
-	service *service.ProjectService
+	repo     interfaces.IProjectRepository
+	taskRepo interfaces.ITaskRepository
+	service  *service.ProjectService
 }
 
-func NewProjectUsecase(repo interfaces.IProjectRepository, service *service.ProjectService) *ProjectUsecase {
-	return &ProjectUsecase{repo: repo, service: service}
+func NewProjectUsecase(repo interfaces.IProjectRepository, taskRepo interfaces.ITaskRepository, service *service.ProjectService) *ProjectUsecase {
+	return &ProjectUsecase{repo: repo, taskRepo: taskRepo, service: service}
 }
 
 func (u *ProjectUsecase) CreateProject(name string, description *string) (*entities.Project, error) {
@@ -30,7 +31,24 @@ func (u *ProjectUsecase) ListProjects() ([]entities.Project, error) {
 	return u.repo.FindAllActive()
 }
 
-func (u *ProjectUsecase) ArchiveProject(project entities.Project) error {
+// 指定された project と関連 task を archive する
+func (u *ProjectUsecase) ArchiveProjectAndRelatedTasks(project entities.Project) error {
 	project.Archive()
-	return u.repo.Update(&project)
+	err := u.repo.Update(&project)
+	if err != nil {
+		return err
+	}
+
+	// 関連するタスクもアーカイブ
+	tasks, err := u.taskRepo.GetByProjectID(project.ID)
+	if err != nil {
+		return err
+	}
+	for _, task := range tasks {
+		task.Archive()
+		if err := u.taskRepo.Update(&task); err != nil {
+			return err
+		}
+	}
+	return nil
 }

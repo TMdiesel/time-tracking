@@ -31,8 +31,9 @@ func (u *TaskUsecase) CreateTask(projectID uuid.UUID, name string, description *
 	return task, err
 }
 
+// archive されていない task 一覧を取得する
 func (u *TaskUsecase) ListTasks() ([]dto.TaskWithProjectDTO, error) {
-	return u.taskRepo.FindAllWithProjectName()
+	return u.taskRepo.FindAllActiveWithProjectName()
 }
 
 func (u *TaskUsecase) StartTask(taskID uuid.UUID) error {

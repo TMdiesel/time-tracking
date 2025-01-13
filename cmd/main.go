@@ -21,10 +21,10 @@ func main() {
 	projectRepo := repositories.NewProjectRepository(db)
 	projectPres := presenter.NewProjectPresenter()
 	projectService := service.NewProjectService(projectRepo)
-	projectUsecase := usecase.NewProjectUsecase(projectRepo, projectService)
+	taskRepo := repositories.NewTaskRepository(db)
+	projectUsecase := usecase.NewProjectUsecase(projectRepo, taskRepo, projectService)
 	projectController := controller.NewProjectController(projectUsecase, projectPres)
 
-	taskRepo := repositories.NewTaskRepository(db)
 	taskPres := presenter.NewTaskPresenter()
 	taskService := service.NewTaskService(taskRepo)
 	timeEntryRepo := repositories.NewTimeEntryRepository(db)
