@@ -23,8 +23,8 @@
 ### インストール方法
 
 ```bash
-git clone https://github.com/your-username/time-tracker-cli.git
-cd time-tracker-cli
+git clone https://github.com/your-username/time-tracker.git
+cd time-tracker
 go build -o time-tracker cmd/main.go
 echo 'export PATH=$PATH:$(pwd)' >> ~/.bashrc  # bash の場合
 source ~/.bashrc
