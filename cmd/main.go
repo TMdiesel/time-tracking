@@ -70,6 +70,15 @@ func main() {
 		},
 	}
 
+	// project archive
+	archiveProjectCmd := &cobra.Command{
+		Use:   "archive",
+		Short: "Archive a project",
+		Run: func(cmd *cobra.Command, args []string) {
+			projectController.ArchiveProject()
+		},
+	}
+
 	// --- Task Commands ---
 	taskCmd := &cobra.Command{
 		Use:   "task",
@@ -148,6 +157,7 @@ func main() {
 	// --- コマンド登録 ---
 	projectCmd.AddCommand(createProjectCmd)
 	projectCmd.AddCommand(listProjectCmd)
+	projectCmd.AddCommand(archiveProjectCmd)
 	taskCmd.AddCommand(createTaskCmd)
 	taskCmd.AddCommand(listTaskCmd)
 	taskCmd.AddCommand(startTaskCmd)

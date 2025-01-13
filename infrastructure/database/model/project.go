@@ -12,4 +12,5 @@ type Project struct {
 	Description *string
 	CreatedAt   time.Time
 	UpdatedAt   time.Time
+	ArchivedAt  *time.Time
 }

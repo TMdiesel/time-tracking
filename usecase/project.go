@@ -25,6 +25,12 @@ func (u *ProjectUsecase) CreateProject(name string, description *string) (*entit
 	return project, err
 }
 
+// archive されていない project 一覧を取得する
 func (u *ProjectUsecase) ListProjects() ([]entities.Project, error) {
-	return u.repo.FindAll()
+	return u.repo.FindAllActive()
+}
+
+func (u *ProjectUsecase) ArchiveProject(project entities.Project) error {
+	project.Archive()
+	return u.repo.Update(&project)
 }

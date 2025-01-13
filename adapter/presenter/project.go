@@ -40,3 +40,7 @@ func (p *ProjectPresenter) ShowError(err error) {
 	fmt.Printf("❌ Error: %v\n", err)
 	os.Exit(1)
 }
+
+func (p *ProjectPresenter) ShowArchiveSuccess(project *entities.Project) {
+	fmt.Printf("✅ Project '%s' has been archived.", project.Name)
+}

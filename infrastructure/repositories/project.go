@@ -1,6 +1,7 @@
 package repositories
 
 import (
+	"fmt"
 	"time-tracker/domain/entities"
 	"time-tracker/domain/interfaces"
 	"time-tracker/infrastructure/database/model"
@@ -26,9 +27,9 @@ func (r *ProjectRepository) Create(project *entities.Project) error {
 	}).Error
 }
 
-func (r *ProjectRepository) FindAll() ([]entities.Project, error) {
+func (r *ProjectRepository) FindAllActive() ([]entities.Project, error) {
 	var projectModels []model.Project
-	err := r.db.Find(&projectModels).Error
+	err := r.db.Where("archived_at IS NULL").Find(&projectModels).Error
 	if err != nil {
 		return nil, err
 	}
@@ -55,4 +56,20 @@ func (r *ProjectRepository) IsNameDuplicated(name string) (bool, error) {
 		return false, err
 	}
 	return count > 0, nil
+}
+
+func (r *ProjectRepository) Update(project *entities.Project) error {
+	updatedModel := model.Project{
+		ID:          project.ID,
+		Name:        project.Name,
+		Description: project.Description,
+		CreatedAt:   project.CreatedAt,
+		UpdatedAt:   project.UpdatedAt,
+		ArchivedAt:  project.ArchivedAt,
+	}
+	if err := r.db.Save(&updatedModel).Error; err != nil {
+		return fmt.Errorf("failed to update time entry: %w", err)
+	}
+
+	return nil
 }
